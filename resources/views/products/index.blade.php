@@ -18,7 +18,7 @@
                         @foreach($variants as $variant)
                             <optgroup label="{{$variant->title}}">
                                 @foreach($variant->product_variant as $product_variant)
-                                    <option value="">{{$product_variant->variant}}</option>
+                                    <option value="{{$product_variant->variant}}">{{$product_variant->variant}}</option>
                                 @endforeach
                             </optgroup>
                         @endforeach

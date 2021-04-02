@@ -1,5 +1,8 @@
 <template>
     <section>
+        <div v-for="error in this.errors" :key="error.id">
+            <small class="text-danger">{{error[0]}}</small>
+        </div>
         <div class="row">
             <div class="col-md-6">
                 <div class="card shadow mb-4">
@@ -116,10 +119,11 @@ export default {
         variants: {
             type: Array,
             required: true
-        }
+        },
     },
     data() {
         return {
+            errors : [],
             product_name: '',
             product_sku: '',
             description: '',
@@ -202,9 +206,15 @@ export default {
             }
             axios.post('/product', product).then(response => {
                 console.log(response.data);
-            }).catch(error => {
-                console.log(error);
+                window.location = window.location.origin+'/product'
+            }).catch((error) => {
+                this.showErrors(error.response.data.errors);
             })
+        },
+        showErrors(errors)
+        {
+            this.errors = errors;
+
         }
 
 

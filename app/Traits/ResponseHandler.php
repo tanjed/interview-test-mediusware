@@ -15,10 +15,11 @@ trait ResponseHandler
         ]);
     }
 
-    public function sendErrorResponse($message = 'Error',$status = 500)
+    public function sendErrorResponse($message = 'Error',$status = 500,$errors = [])
     {
         return response()->json([
             'message' => $message,
+            'errors' => $errors,
             'status' => $status
         ],500);
     }

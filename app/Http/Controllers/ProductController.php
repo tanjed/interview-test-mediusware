@@ -10,6 +10,7 @@ use App\Models\Variant;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
@@ -52,7 +53,16 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-//        dd($request->all());
+        $validator = Validator::make($request->all(), [
+            'title' => 'required',
+            'sku' => 'required|unique:products',
+            'product_image' => 'array',
+            'product_variant' => 'array'
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendErrorResponse('Validation Fails',406,$validator->getMessageBag());
+        }
         //Validation will be places here
         $now = Carbon::now();
         DB::beginTransaction();
@@ -109,7 +119,6 @@ class ProductController extends Controller
                     ]
                 ],'Product created.');
         }catch (\Exception $exception){
-            dd($exception);
             DB::rollBack();
             return $this->sendErrorResponse($exception->getMessage());
         }
