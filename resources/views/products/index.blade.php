@@ -56,16 +56,16 @@
                         <td>{{$product->id}}</td>
                         <td>{{$product->title}} <br> Created at : {{$product->created_at}}</td>
                         <td>{{$product->description}}</td>
-                        <td>
+                        <td style="width: 40%">
                             <dl class="row mb-0" style="height: 80px; overflow: hidden" id="variant">
-                                @foreach($product->variants as $variant)
+                                @foreach($product->variant_price as $variant)
                                 <dt class="col-sm-3 pb-0">
-                                    {{$variant->variant}}
+                                    {{$variant->product_sub_variant_name}}
                                 </dt>
                                 <dd class="col-sm-9">
                                     <dl class="row mb-0">
-                                        <dt class="col-sm-4 pb-0">Price : {{ number_format($variant->variant_price->price,2) }}</dt>
-                                        <dd class="col-sm-8 pb-0">InStock : {{ number_format($variant->variant_price->stock,2) }}</dd>
+                                        <dt class="col-sm-4 pb-0">Price : {{ number_format($variant->price,2) }}</dt>
+                                        <dd class="col-sm-8 pb-0">InStock : {{ number_format($variant->stock,2) }}</dd>
                                     </dl>
                                 </dd>
                                 @endforeach

@@ -18,4 +18,8 @@ class Product extends Model
     {
         return $this->hasMany(ProductVariant::class,'product_id','id');
     }
+    public function variant_price()
+    {
+        return $this->hasManyThrough(ProductVariantPrice::class,ProductVariant::class,'product_id','product_variant_one');
+    }
 }

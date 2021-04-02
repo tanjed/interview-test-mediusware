@@ -20,7 +20,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::with('variants.variant_price')->paginate(1);
+        $products = Product::with(['variants','variant_price'])->paginate(1);
         return view('products.index',compact('products'));
     }
 
@@ -43,6 +43,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+//        dd($request->all());
         //Validation will be places here
         $now = Carbon::now();
         DB::beginTransaction();
@@ -59,24 +60,33 @@ class ProductController extends Controller
                     'file_path' => $path
                 ]);
             }
+            $prepared_variants = [];
+            foreach ($request->product_variant as $variant)
+            {
+                $variant_id = $variant['option'];
+                foreach ($variant['tags'] as $tag){
+                    array_push($prepared_variants,[
+                        'variant'=> $tag,
+                        'variant_id' => $variant_id,
+                        'product_id'=> $product->id,
+                        'created_at' => $now->toDateTimeString(),
+                        'updated_at' => $now->toDateTimeString()
+                    ]);
+                }
+            }
+            ProductVariant::insert($prepared_variants);
             $prepared_variant_price_data = [];
             foreach ($request->product_variant_prices as $variant_price)
             {
                 $variant_id = $variant_price['variant_id'];
-                $product_variant = ProductVariant::create([
-                    'variant'=> $variant_price['title'],
-                    'variant_id' => $variant_id,
-                    'product_id'=> $product->id,
-                    'created_at' => $now->toDateTimeString(),
-                    'updated_at' => $now->toDateTimeString()
-                ]);
                 array_push($prepared_variant_price_data,[
-                    'product_variant_one' => $product_variant->id,
+                    'product_variant_one' => $variant_id,
                     'price' => $variant_price['price'],
                     'stock' => $variant_price['stock'],
                     'product_id'=> $product->id,
                     'created_at' => $now->toDateTimeString(),
-                    'updated_at' => $now->toDateTimeString()
+                    'updated_at' => $now->toDateTimeString(),
+                    'product_sub_variant_name' => $variant_price['title']
 
                 ]);
             }
@@ -90,6 +100,7 @@ class ProductController extends Controller
                     ]
                 ],'Product created.');
         }catch (\Exception $exception){
+            dd($exception);
             DB::rollBack();
             return $this->sendErrorResponse($exception->getMessage());
         }
