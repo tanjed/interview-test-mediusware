@@ -24,7 +24,13 @@
                         <h6 class="m-0 font-weight-bold text-primary">Media</h6>
                     </div>
                     <div class="card-body border">
-                        <vue-dropzone ref="myVueDropzone" id="dropzone" :options="dropzoneOptions"></vue-dropzone>
+                        <vue-dropzone
+                            ref="myVueDropzone"
+                            id="dropzone"
+                            :options="dropzoneOptions"
+                            @vdropzone-complete="handleUploadedFile"
+                            >
+                        </vue-dropzone>
                     </div>
                 </div>
             </div>
@@ -126,20 +132,25 @@ export default {
             ],
             product_variant_prices: [],
             dropzoneOptions: {
-                url: 'https://httpbin.org/post',
                 thumbnailWidth: 150,
-                maxFilesize: 0.5,
-                headers: {"My-Awesome-Header": "header value"}
+                maxFilesize: 1,
+                url: window.location.origin+'/api/image',
+
             }
         }
     },
     methods: {
+        handleUploadedFile(response)
+        {
+            let url = JSON.parse(response.xhr.response).data.path
+            this.images.push(url)
+        },
         // it will push a new object into product variant
         newVariant() {
             let all_variants = this.variants.map(el => el.id)
             let selected_variants = this.product_variant.map(el => el.option);
             let available_variants = all_variants.filter(entry1 => !selected_variants.some(entry2 => entry1 == entry2))
-            // console.log(available_variants)
+             console.log(available_variants,selected_variants)
 
             this.product_variant.push({
                 option: available_variants[0],
@@ -149,14 +160,16 @@ export default {
 
         // check the variant and render all the combination
         checkVariant() {
+            let variant_id;
             let tags = [];
             this.product_variant_prices = [];
             this.product_variant.filter((item) => {
+                variant_id = item.option
                 tags.push(item.tags);
             })
-
             this.getCombn(tags).forEach(item => {
                 this.product_variant_prices.push({
+                    variant_id : variant_id,
                     title: item,
                     price: 0,
                     stock: 0
@@ -187,15 +200,11 @@ export default {
                 product_variant: this.product_variant,
                 product_variant_prices: this.product_variant_prices
             }
-
-
             axios.post('/product', product).then(response => {
                 console.log(response.data);
             }).catch(error => {
                 console.log(error);
             })
-
-            console.log(product);
         }
 
 
