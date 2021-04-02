@@ -8,7 +8,7 @@
 
 
     <div class="card">
-        <form action="" method="get" class="card-header">
+        <form action="{{route('search')}}" method="get" class="card-header">
             <div class="form-row justify-content-between">
                 <div class="col-md-2">
                     <input type="text" name="title" placeholder="Product Title" class="form-control">
@@ -95,7 +95,8 @@
         <div class="card-footer">
             <div class="row justify-content-between">
                 <div class="col-md-6">
-                    <p>Showing {{$products->currentPage()}} to {{$products->currentPage()+1}} out of {{$products->total()}}</p>
+                    <p>Showing {{($products->currentPage()-1) * $products->perPage()+($products->total() ? 1:0)}}
+                        to {{($products->currentPage()-1) * $products->perPage()+count($products)}}  out of  {{$products->total()}}</p>
                 </div>
                 <div class="col-md-2">
                     {{$products->links()}}

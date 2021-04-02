@@ -13,6 +13,13 @@ use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
+    public $default_pagination;
+
+    public function __construct()
+    {
+        $this->default_pagination = config('essentials.default_pagination');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -20,7 +27,8 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::with(['variant_price'])->paginate(1);
+        $pagination = $this->default_pagination;
+        $products = Product::with(['variant_price'])->paginate($pagination);
         $variants = Variant::with('product_variant')->get();
         return view('products.index',compact('products','variants'));
     }
